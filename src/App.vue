@@ -51,7 +51,7 @@
 
 <script>
 export default {
-  data () {
+  data: function() {
     return {
       playerHealth: 100,
       monsterHealth: 100,
@@ -59,12 +59,12 @@ export default {
     }
   },
   methods: {
-    startGame() {
+    startGame: function() {
       this.gameOn = true;
       this.playerHealth = 100;
       this.monsterHealth = 100;
     },
-    attack() { 
+    attack: function() { 
       this.playerHealth -= this.damage(3, 30);
         if (this.monsterHealth <= 0) {
           alert("You won!");
@@ -77,7 +77,7 @@ export default {
           this.gameOn = false;
         }
     },
-    damage (min, max) {
+    damage: function(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
       }
   }
