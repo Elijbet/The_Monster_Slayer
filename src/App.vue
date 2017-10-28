@@ -33,15 +33,16 @@
             <div class="small-12 columns">
                 <button id="attack" @click="attack">ATTACK</button>
                 <button id="special-attack" @click="specialAttack" >SPECIAL ATTACK</button>
-                <button id="heal" >HEAL</button>
-                <button id="give-up" >GIVE UP</button>
+                <button id="heal" @click="heal">HEAL</button>
+                <button id="give-up" @click="giveUp">GIVE UP</button>
             </div>
         </section>
-        <section class="row log">
+        <section class="row log" v-if="turns.length > 0">
             <div class="small-12 columns">
                 <ul>
-                    <li>
-
+                    <li v-for="item in turns" 
+                        :class="{ 'player-turn': turns.isPlayer, 'monster-turn': !turns.isPlayer}">
+                        {{ item.text }}
                     </li>
                 </ul>
             </div>
@@ -55,7 +56,8 @@ export default {
     return {
       playerHealth: 100,
       monsterHealth: 100,
-      gameOn: false
+      gameOn: false,
+      turns: []
     }
   },
   methods: {
@@ -63,10 +65,15 @@ export default {
       this.gameOn = true;
       this.playerHealth = 100;
       this.monsterHealth = 100;
+      this.turns = []
     },
     attack: function() { 
-
-      this.monsterHealth -= this.damage(3, 10);
+      var damageLog = this.damage(3, 10);
+      this.monsterHealth -= damageLog;
+      this.turns.unshift({
+        isPlayer: true,
+        text: 'Player hits monster for ' + damageLog
+      });
       if (this.checkWin()){
         return;
       }
@@ -75,15 +82,42 @@ export default {
 
     },
     specialAttack: function(){
-      this.monsterHealth -= this.damage(3, 20);
+      var damageLog = this.damage(3, 20);
+      this.monsterHealth -= damageLog;
+      this.turns.unshift({
+        isPlayer: true,
+        text: 'Player hits monster hard for ' + damageLog
+      });
       if (this.checkWin()){
         return;
       }
 
       this.monsterAttacks();
     },
+    heal: function(){
+        
+        if (this.playerHealth <= 90){
+          this.playerHealth += 10;  
+        } else { 
+            this.playerHealth = 100;
+        };
+
+        this.turns.unshift({
+            isPlayer: true,
+            text: 'Player heals for ' + 10
+          });
+        this.monsterAttacks();
+    },
+    giveUp: function() {
+      this.gameOn = false;
+    },
     monsterAttacks: function(){
-      this.playerHealth -= this.damage(3, 12);
+      var damageLog = this.damage(3, 12);
+      this.playerHealth -= damageLog;
+      this.turns.unshift({
+        isPlayer: false,
+        text: 'Monster hits player for ' + damageLog 
+      });
       this.checkWin();
     },
     damage: function (min, max) {
