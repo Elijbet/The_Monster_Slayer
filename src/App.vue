@@ -32,9 +32,9 @@
         <section class="row controls" v-else>
             <div class="small-12 columns">
                 <button id="attack" @click="attack">ATTACK</button>
-                <button id="special-attack" @click="specialAttack">SPECIAL ATTACK</button>
-                <button id="heal" @click="heal">HEAL</button>
-                <button id="give-up" @click="giveUp">GIVE UP</button>
+                <button id="special-attack" @click="specialAttack" >SPECIAL ATTACK</button>
+                <button id="heal" >HEAL</button>
+                <button id="give-up" >GIVE UP</button>
             </div>
         </section>
         <section class="row log">
@@ -65,21 +65,48 @@ export default {
       this.monsterHealth = 100;
     },
     attack: function() { 
-      this.playerHealth -= this.damage(3, 30);
-        if (this.monsterHealth <= 0) {
-          alert("You won!");
-          this.gameOn = false;
-          return;
-        }
-      this.monsterHealth -= this.damage(3, 20);
-        if (this.playerHealth <= 0) {
-          alert("You lost!");
-          this.gameOn = false;
-        }
-    },
-    damage: function(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+
+      this.monsterHealth -= this.damage(3, 10);
+      if (this.checkWin()){
+        return;
       }
+
+      this.monsterAttacks();
+
+    },
+    specialAttack: function(){
+      this.monsterHealth -= this.damage(3, 20);
+      if (this.checkWin()){
+        return;
+      }
+
+      this.monsterAttacks();
+    },
+    monsterAttacks: function(){
+      this.playerHealth -= this.damage(3, 12);
+      this.checkWin();
+    },
+    damage: function (min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      },
+    checkWin: function (){
+        if (this.monsterHealth <= 0) {
+          if (confirm('You won! New game?')){
+            this.startGame();
+          } else {
+            this.gameOn = false;
+          }
+          return true;
+        } else if (this.playerHealth <= 0) {
+          if (confirm('You lost! New game?')){
+            this.startGame();
+          } else {
+            this.gameOn = false;
+          }
+          return true;
+        }
+        return false;
+    }
   }
 }
 </script>
