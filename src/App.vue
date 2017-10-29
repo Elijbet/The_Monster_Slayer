@@ -41,7 +41,7 @@
             <div class="small-12 columns">
                 <ul>
                     <li v-for="item in turns" 
-                        :class="{ 'player-turn': turns.isPlayer, 'monster-turn': !turns.isPlayer}">
+                        :class="{ 'player-turn': item.isPlayer, 'monster-turn': !item.isPlayer}">
                         {{ item.text }}
                     </li>
                 </ul>
