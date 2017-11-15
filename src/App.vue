@@ -1,53 +1,52 @@
 <template>
-    <div id="app">
-        <section class="row">
-            <div class="small-6 columns">
-                <h1 class="text-center">YOU</h1>
-                <div class="healthbar">
-                    <div 
-                      class="healthbar text-center" 
-                      style="background-color: green; margin: 0; color: white;" 
-                      :style="{width: playerHealth + '%'}">
-                      {{ playerHealth }}
-                    </div>
-                </div>
-            </div>
-            <div class="small-6 columns">
-                <h1 class="text-center">MONSTER</h1>
-                <div class="healthbar">
-                    <div 
-                      class="healthbar text-center" 
-                      style="background-color: green; margin: 0; color: white;"
-                      :style="{width: monsterHealth + '%'}">
-                      {{ monsterHealth }}
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section class="row controls"  v-if="!gameOn">
-            <div class="small-12 columns">
-                <button id="start-game" @click="startGame">START NEW GAME</button>
-            </div>
-        </section>
-        <section class="row controls" v-else>
-            <div class="small-12 columns">
-                <button id="attack" @click="attack">ATTACK</button>
-                <button id="special-attack" @click="specialAttack" >SPECIAL ATTACK</button>
-                <button id="heal" @click="heal">HEAL</button>
-                <button id="give-up" @click="giveUp">GIVE UP</button>
-            </div>
-        </section>
-        <section class="row log" v-if="turns.length > 0">
-            <div class="small-12 columns">
-                <ul>
-                    <li v-for="item in turns" 
-                        :class="{ 'player-turn': item.isPlayer, 'monster-turn': !item.isPlayer}">
-                        {{ item.text }}
-                    </li>
-                </ul>
-            </div>
-        </section>
-    </div>
+   <div id="app">
+      <section class="row">
+          <div class="small-6 columns">
+              <h1 class="text-center">YOU</h1>
+              <div class="healthbar">
+                  <div 
+                    class="healthbar text-center" 
+                    style="background-color: green; margin: 0; color: white;"
+                    :style="{ width: playerHealth + '%'}">
+                    {{ playerHealth }}
+                  </div>
+              </div>
+          </div>
+          <div class="small-6 columns">
+              <h1 class="text-center">MONSTER</h1>
+              <div class="healthbar">
+                  <div 
+                    class="healthbar text-center" 
+                    style="background-color: green; margin: 0; color: white;"
+                    :style="{ width: monsterHealth + '%'}">
+                    {{ monsterHealth }}
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="row controls" v-if="!gameOn">
+          <div class="small-12 columns">
+              <button id="start-game" @click="startGame">START NEW GAME</button>
+          </div>
+      </section>
+      <section class="row controls" v-else>
+          <div class="small-12 columns">
+              <button id="attack" @click="attack">ATTACK</button>
+              <button id="special-attack">SPECIAL ATTACK</button>
+              <button id="heal">HEAL</button>
+              <button id="give-up">GIVE UP</button>
+          </div>
+      </section>
+      <section class="row log">
+          <div class="small-12 columns">
+              <ul>
+                  <li>
+
+                  </li>
+              </ul>
+          </div>
+      </section>
+  </div>
 </template>
 
 <script>
@@ -56,90 +55,48 @@ export default {
     return {
       playerHealth: 100,
       monsterHealth: 100,
-      gameOn: false,
-      turns: []
+      gameOn: false
     }
   },
   methods: {
-    startGame: function() {
+    startGame: function(){
       this.gameOn = true;
       this.playerHealth = 100;
       this.monsterHealth = 100;
-      this.turns = []
     },
-    attack: function() { 
-      var damageLog = this.damage(3, 10);
-      this.monsterHealth -= damageLog;
-      this.turns.unshift({
-        isPlayer: true,
-        text: 'Player hits monster for ' + damageLog
-      });
+    attack: function(){
+      
+      this.monsterHealth -= this.calculateDamage(3, 10);
+
       if (this.checkWin()){
         return;
       }
+       
+      this.playerHealth -= this.calculateDamage(5, 12);
 
-      this.monsterAttacks();
-
-    },
-    specialAttack: function(){
-      var damageLog = this.damage(3, 20);
-      this.monsterHealth -= damageLog;
-      this.turns.unshift({
-        isPlayer: true,
-        text: 'Player hits monster hard for ' + damageLog
-      });
-      if (this.checkWin()){
-        return;
-      }
-
-      this.monsterAttacks();
-    },
-    heal: function(){
-        
-        if (this.playerHealth <= 90){
-          this.playerHealth += 10;  
-        } else { 
-            this.playerHealth = 100;
-        };
-
-        this.turns.unshift({
-            isPlayer: true,
-            text: 'Player heals for ' + 10
-          });
-        this.monsterAttacks();
-    },
-    giveUp: function() {
-      this.gameOn = false;
-    },
-    monsterAttacks: function(){
-      var damageLog = this.damage(3, 12);
-      this.playerHealth -= damageLog;
-      this.turns.unshift({
-        isPlayer: false,
-        text: 'Monster hits player for ' + damageLog 
-      });
       this.checkWin();
+
     },
-    damage: function (min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-      },
-    checkWin: function (){
-        if (this.monsterHealth <= 0) {
-          if (confirm('You won! New game?')){
-            this.startGame();
-          } else {
-            this.gameOn = false;
-          }
-          return true;
-        } else if (this.playerHealth <= 0) {
-          if (confirm('You lost! New game?')){
-            this.startGame();
-          } else {
-            this.gameOn = false;
-          }
-          return true;
+    calculateDamage: function(min, max){
+      return Math.max(Math.floor(Math.random() * max) + 1, min);
+    },
+    checkWin: function(){
+      if(this.monsterHealth <= 0) {
+        if (confirm('You won! New Game?')){
+          this.startGame();
+        } else {
+          this.gameOn = false;
         }
-        return false;
+        return true; 
+      } else if (this.playerHealth <= 0) {
+        if (confirm('You lost! New Game?')){
+          this.startGame();
+        } else {
+          this.gameOn = false;
+        }
+        return true;  
+      }
+      return false;
     }
   }
 }
